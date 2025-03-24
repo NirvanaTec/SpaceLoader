@@ -1,0 +1,1 @@
+"C:\Program Files\vol_dev\win_android_chs_free\bin\x64\voldev_f.exe" "SpaceLoader.vsln"

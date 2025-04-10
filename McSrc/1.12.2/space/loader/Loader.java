@@ -57,54 +57,36 @@ public class Loader extends Thread {
                 System.out.println("2AContextClassLoader");
                 return;
             }
-            
-            System.out.println("2B");
-            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-            System.out.println("2C");
-            Field field = unsafeClass.getDeclaredField("theUnsafe");
-            System.out.println("2D");
-            field.setAccessible(true);
-            System.out.println("2E");
-            this.setContextClassLoader(contextClassLoader);
-            System.out.println("2F");
-            final Method declaredMethod = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, Integer.TYPE, Integer.TYPE, ProtectionDomain.class);
-            System.out.println("2G");
-            declaredMethod.setAccessible(true);
-            System.out.println("2H");
 
-            Class<?> Inject = null;
-            System.out.println("3B");
+            System.out.println("Unsafe");
+            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+            Field field = unsafeClass.getDeclaredField("theUnsafe");
+            field.setAccessible(true);
+            this.setContextClassLoader(contextClassLoader);
+            Method defineClass = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, Integer.TYPE, Integer.TYPE, ProtectionDomain.class);
+            defineClass.setAccessible(true);
+
+            System.out.println("Load" + this.classes.length + "....");
             for (final byte[] array : this.classes) {
-                System.out.println("4B");
-                if (array != null) {
-                    final Object clazz1 = declaredMethod.invoke(contextClassLoader, null, array, 0, array.length, contextClassLoader.getClass().getProtectionDomain());
-                    if (clazz1 != null) {
-                        final Class<?> clazz = (Class<?>) clazz1;
-                        String name = clazz.getName();
-                        System.out.println("4A" + name);
-                        if (name.contains(className)) {
-                            Inject = clazz;
-                            System.out.println("4AOK");
-                        }else {
-                            System.out.println("4AContains");
-                        }
-                    } else {
-                        System.out.println("4ANull");
-                    }
-                } else {
+                if (array == null) {
                     System.out.println("3ANull");
+                    continue;
+                }
+                System.out.println("DefineClass");
+                Class<?> clazz = (Class<?>) defineClass.invoke(contextClassLoader, null, array, 0, array.length, contextClassLoader.getClass().getProtectionDomain());
+                String name = clazz.getName();
+                System.out.println("4A" + name);
+                if (name.contains(className)) {
+                    System.out.println("Loading....");
+                    clazz.getDeclaredMethod("Load").invoke(null);
                 }
             }
-            System.out.println("4AFinish");
-            if (Inject != null) {
-                System.out.println("Loading....");
-                Inject.getDeclaredMethod("Load").invoke(null);
-            } else {
-                System.out.println("5AError");
-            }
+
             System.out.println("----Nirvana AND Space---");
-        } catch (Throwable e) {
+
+        } catch (Exception e) {
             e.fillInStackTrace();
         }
+
     }
 }

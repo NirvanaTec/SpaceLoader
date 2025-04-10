@@ -40,6 +40,7 @@ public class Loader extends Thread {
         try {
             System.out.println("----Nirvana AND Space---");
             String className = "space.loader.InjectionEndpoint";
+
             ClassLoader contextClassLoader = null;
             Set<Thread> threadAllKey = Thread.getAllStackTraces().keySet();
 
@@ -56,6 +57,7 @@ public class Loader extends Thread {
                 return;
             }
 
+            System.out.println("Unsafe");
             Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
             Field field = unsafeClass.getDeclaredField("theUnsafe");
             field.setAccessible(true);
@@ -65,38 +67,30 @@ public class Loader extends Thread {
             long addr = unsafe.objectFieldOffset(Class.class.getDeclaredField("module"));
             unsafe.getAndSetObject(currentClass, addr, baseModule);
             this.setContextClassLoader(contextClassLoader);
-            final Method declaredMethod = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, Integer.TYPE, Integer.TYPE, ProtectionDomain.class);
-            declaredMethod.setAccessible(true);
+            Method defineClass = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, Integer.TYPE, Integer.TYPE, ProtectionDomain.class);
+            defineClass.setAccessible(true);
 
-            Class<?> Inject = null;
+            System.out.println("Load" + this.classes.length + "....");
             for (final byte[] array : this.classes) {
-                if (array != null) {
-                    final Object clazz1 = declaredMethod.invoke(contextClassLoader, null, array, 0, array.length, contextClassLoader.getClass().getProtectionDomain());
-                    if (clazz1 != null) {
-                        final Class<?> clazz = (Class<?>) clazz1;
-                        String name = clazz.getName();
-                        System.out.println("4A" + name);
-                        if (name.contains(className)) {
-                            Inject = clazz;
-                            System.out.println("4AOK");
-                        }
-                    } else {
-                        System.out.println("4ANull");
-                    }
-                } else {
+                if (array == null) {
                     System.out.println("3ANull");
+                    continue;
+                }
+                System.out.println("DefineClass");
+                Class<?> clazz = (Class<?>) defineClass.invoke(contextClassLoader, null, array, 0, array.length, contextClassLoader.getClass().getProtectionDomain());
+                String name = clazz.getName();
+                System.out.println("4A" + name);
+                if (name.contains(className)) {
+                    System.out.println("Loading....");
+                    clazz.getDeclaredMethod("Load").invoke(null);
                 }
             }
-            System.out.println("4AFinish");
-            if (Inject != null) {
-                System.out.println("Loading....");
-                Inject.getDeclaredMethod("Load").invoke(null);
-            } else {
-                System.out.println("5AError");
-            }
+
             System.out.println("----Nirvana AND Space---");
-        } catch (Throwable e) {
+
+        } catch (Exception e) {
             e.fillInStackTrace();
         }
+
     }
 }

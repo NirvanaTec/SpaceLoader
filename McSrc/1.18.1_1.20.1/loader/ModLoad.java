@@ -7,12 +7,14 @@
  */
 package space.loader;
 
+import net.minecraftforge.fml.common.Mod;
 import space.Core;
 
-public class InjectionEndpoint {
+@Mod("space")
+public class ModLoad {
 
-    public static void Load() {
-        Core.mode = false;
-        new space.Core().initialize();
+    public ModLoad() {
+        new Core().initialize();
     }
+
 }

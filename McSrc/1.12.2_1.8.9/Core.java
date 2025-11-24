@@ -5,14 +5,12 @@
  * https://github.com/NirvanaTec/
  * 最终解释权归涅槃科技所有，涅槃科技版权所有。
  */
-package space.loader;
+package space;
 
-import space.Core;
+public class Core {
 
-public class InjectionEndpoint {
-
-    public static void Load() {
-        Core.mode = false;
-        new Core().initialize();
+    public void initialize() {
+        System.out.print("Hello Space Loader !!!");
     }
+
 }

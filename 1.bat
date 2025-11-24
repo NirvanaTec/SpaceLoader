@@ -1,1 +1,1 @@
-"C:\Program Files\vol_dev\win_android_chs_free\bin\x64\voldev_f.exe" "SpaceLoader.vsln"
+"C:\Users\fengh\.jdks\temurin-22.0.2\bin\java.exe" -cp "JavaDllPacker.jar;SpacePacker\libs\fastjson2-2.0.60.jar;" space.JavaDllPacker
